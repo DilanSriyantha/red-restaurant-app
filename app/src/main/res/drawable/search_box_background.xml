@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:state_window_focused="true">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <solid android:color="@color/grey"/>
+            <corners android:radius="100000dp"/>
+        </shape>
+    </item>
+    <item android:state_focused="false" android:state_window_focused="false">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <solid android:color="@color/grey"/>
+            <corners android:radius="100000dp"/>
+        </shape>
+    </item>
+</selector>
