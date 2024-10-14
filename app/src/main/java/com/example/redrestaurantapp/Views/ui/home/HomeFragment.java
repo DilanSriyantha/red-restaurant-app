@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import com.example.redrestaurantapp.Adapters.CategoriesAdapter;
 import com.example.redrestaurantapp.Adapters.ProductsAdapter;
 import com.example.redrestaurantapp.Controllers.CategoryController;
 import com.example.redrestaurantapp.Controllers.ProductController;
+import com.example.redrestaurantapp.ProductsActivity;
 import com.example.redrestaurantapp.Utils.Cart;
 import com.example.redrestaurantapp.Utils.ThreadPoolManager;
 import com.example.redrestaurantapp.Views.ItemDetailsActivity;
@@ -41,6 +43,9 @@ public class HomeFragment extends Fragment {
     private RecyclerView mProductRecycler;
     private RecyclerView mAllProductsRecycler;
 
+    private ImageButton mBtnOrderAgainForward;
+    private ImageButton mBtnAllProductsForward;
+
     private ProgressBar mProgressCategory;
     private ProgressBar mProgressOrderAgain;
     private ProgressBar mProgressAllProducts;
@@ -61,6 +66,12 @@ public class HomeFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        mBtnOrderAgainForward = root.findViewById(R.id.btnOrderAgainForward);
+        mBtnAllProductsForward = root.findViewById(R.id.btnAllProductsForward);
+
+        mBtnOrderAgainForward.setOnClickListener(this::onOrderAgainForwardClick);
+        mBtnAllProductsForward.setOnClickListener(this::onAllProductsForwardClick);
 
         mCategoryRecycler = root.findViewById(R.id.categoryRecycler);
         mProductRecycler = root.findViewById(R.id.orderAgainRecycler);
@@ -161,6 +172,15 @@ public class HomeFragment extends Fragment {
         Intent productDetailsActivity = new Intent(getActivity(), ItemDetailsActivity.class);
         productDetailsActivity.putExtra("product", mProductController.getProduct(position));
         startActivity(productDetailsActivity);
+    }
+
+    private void onOrderAgainForwardClick(View v){
+        onAllProductsForwardClick(v);
+    }
+
+    private void onAllProductsForwardClick(View v){
+        Intent productsActivity = new Intent(requireActivity(), ProductsActivity.class);
+        startActivity(productsActivity);
     }
 
     private void setCategoryLoading(boolean state){

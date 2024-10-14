@@ -20,9 +20,13 @@
         android:theme="@style/Theme.RedRestaurantApp"
         tools:targetApi="31">
         <activity
-            android:name=".ViewOrderActivity"
+            android:name=".ProductsActivity"
             android:exported="false"
             android:theme="@style/Theme.RedRestaurantAppCustomAppBar"/>
+        <activity
+            android:name=".ViewOrderActivity"
+            android:exported="false"
+            android:theme="@style/Theme.RedRestaurantAppCustomAppBar" />
         <activity
             android:name=".Views.ItemDetailsActivity"
             android:exported="false"

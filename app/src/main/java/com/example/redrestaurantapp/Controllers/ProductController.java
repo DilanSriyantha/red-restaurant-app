@@ -2,6 +2,7 @@ package com.example.redrestaurantapp.Controllers;
 
 import android.os.Handler;
 import android.util.Log;
+import android.util.Pair;
 
 import com.example.redrestaurantapp.Interfaces.GetCollectionCallback;
 import com.example.redrestaurantapp.Models.Product;
@@ -18,6 +19,7 @@ public class ProductController {
 
     private boolean FLAG_LOADING = false;
     private final String TAG = "ProductController";
+    private boolean mIsManualDataLoader = false;
 
     public ProductController() {
         mProductList = new ArrayList<>();
@@ -25,6 +27,14 @@ public class ProductController {
         mThreadPoolManager = ThreadPoolManager.getInstance();
 
         loadData();
+    }
+
+    public ProductController(boolean isManualDataLoader){
+        mIsManualDataLoader = true;
+
+        mProductList = new ArrayList<>();
+        mFirestore = new FireStore();
+        mThreadPoolManager = ThreadPoolManager.getInstance();
     }
 
     public void addProduct(Product product){
@@ -41,6 +51,42 @@ public class ProductController {
 
     public boolean isLoading() {
         return FLAG_LOADING;
+    }
+
+    public void loadData(Pair<String, Object> whereEqualsTo) {
+        FLAG_LOADING = true;
+
+        if(whereEqualsTo == null) {
+            loadData();
+            return;
+        }
+
+        mThreadPoolManager.submitTask(new Runnable() {
+            @Override
+            public void run() {
+                mFirestore.getCollection("product", whereEqualsTo, Product.class, new GetCollectionCallback<Product>() {
+                    @Override
+                    public void onSuccess(List<Product> resultList) {
+                        mProductList = resultList;
+
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                FLAG_LOADING = false;
+                            }
+                        }, 1000);
+                    }
+
+                    @Override
+                    public void onFailure(Exception ex) {
+                        ex.printStackTrace();
+                        Log.d(TAG, ex.getLocalizedMessage());
+                        FLAG_LOADING = false;
+                    }
+                });
+            }
+        });
     }
 
     private void loadData() {

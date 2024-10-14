@@ -36,7 +36,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
     @NonNull
     @Override
     public ProductsAdapter.ProductsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        int layoutId = mLayoutType == LayoutType.WIDE ? R.layout.product_item_wide : R.layout.product_item;
+        int layoutId = mLayoutType == LayoutType.WIDE ? R.layout.product_item_wide : mLayoutType == LayoutType.LARGE ? R.layout.product_item_wide_2 : R.layout.product_item;
         View view = LayoutInflater.from(mCtx).inflate(layoutId, parent, false);
 
         return new ProductsViewHolder(view, mOnItemClickListener);
@@ -49,6 +49,10 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         holder.mProductName.setText(mProductList.get(position).getName());
         holder.mDescription.setText(mProductList.get(position).getDescription());
         holder.mPrice.setText("LKR " + mProductList.get(position).getPrice() + "/=");
+    }
+
+    public Product getProduct(int pos){
+        return mProductList.get(pos);
     }
 
     @Override
@@ -87,6 +91,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
 
     public enum LayoutType {
         WIDE,
-        NARROW
+        NARROW,
+        LARGE
     }
 }
