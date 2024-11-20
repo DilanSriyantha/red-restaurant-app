@@ -12,5 +12,5 @@
     <color name="force_white">#ffffff</color>
     <color name="force_black">#000000</color>
     <color name="transparent">#80000000</color>
-    <color name="notification_unread">#FFEBEE</color>
+    <color name="notification_unread">#f8d7da</color>
 </resources>

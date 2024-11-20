@@ -35,4 +35,5 @@
     <string name="subtotal">Subtotal</string>
     <string name="place_order">Place Order</string>
     <string name="empty_cart">Empty</string>
+    <string name="notifications_section_1">Latest</string>
 </resources>

@@ -45,8 +45,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @Override
     public void onBindViewHolder(@NonNull NotificationAdapter.NotificationViewHolder holder, int position) {
-        if(!mNotificationsList.get(position).isSeen())
-            holder.mNotificationBackground.setBackgroundColor(mCtx.getResources().getColor(R.color.notification_unread));
+//        if(!mNotificationsList.get(position).isSeen())
+//            holder.mNotificationBackground.setBackgroundColor(mCtx.getResources().getColor(R.color.notification_unread));
         holder.mTxtTitle.setText(mNotificationsList.get(position).getTitle());
         holder.mTxtMessage.setText(mNotificationsList.get(position).getMessage());
         holder.mTxtDatetime.setText(timestampToDate(mNotificationsList.get(position).getTimestamp()));

@@ -2,6 +2,7 @@ package com.example.redrestaurantapp.Utils;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ public class Notifications {
     private static RealtimeDataBase mRdb;
     private static final List<OnNotificationChange> mOnChangeListeners = new ArrayList<>();
     private static UserManager mUserManager;
+    private static boolean isLoading = false;
 
     public Notifications() {
         mRdb = RealtimeDataBase.getInstance("notifications");
@@ -58,6 +60,39 @@ public class Notifications {
 
     public void fetch(RealtimeDataBase.OnFetchCompleted<Notification> callback) {
         mRdb.fetch(mUserManager.getCurrentUser().getUid(), Notification.class, callback);
+    }
+
+    public void fetch(){
+        isLoading = true;
+        mRdb.fetch(mUserManager.getCurrentUser().getUid(), Notification.class, new RealtimeDataBase.OnFetchCompleted<Notification>() {
+            @Override
+            public void onSuccessful(List<Notification> children) {
+                mNotificationList.clear();
+                mNotificationList.addAll(children);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        isLoading = false;
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public void onFailure(Exception ex) {
+                ex.printStackTrace();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        isLoading = false;
+                    }
+                }, 1000);
+            }
+        });
+    }
+
+    public boolean isLoading() {
+        return isLoading;
     }
 
     public void add(Notification notification){

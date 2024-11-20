@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -22,6 +23,8 @@ import com.example.redrestaurantapp.ServiceLayer.RealtimeDataBase;
 import com.example.redrestaurantapp.ServiceLayer.UserManager;
 import com.example.redrestaurantapp.Utils.Cart;
 import com.example.redrestaurantapp.Utils.Notifications;
+import com.example.redrestaurantapp.Utils.ThreadPoolManager;
+import com.facebook.shimmer.ShimmerFrameLayout;
 
 import java.util.List;
 
@@ -37,14 +40,19 @@ public class NotificationsActivity extends BaseActivity {
 
     private RecyclerView mNotificationsRecycler;
 
+    private ConstraintLayout mNotificationListContainer;
+    private ShimmerFrameLayout mShimmerFrameLayout;
+
     private final Notifications mNotifications;
     private final UserManager mUserManager;
     private final Cart mCart;
+    private final ThreadPoolManager mThreadPoolManager;
 
     public NotificationsActivity() {
         mCart = Cart.getInstance();
         mNotifications = Notifications.getInstance();
         mUserManager = new UserManager();
+        mThreadPoolManager = ThreadPoolManager.getInstance();
     }
 
     @Override
@@ -71,6 +79,9 @@ public class NotificationsActivity extends BaseActivity {
         mTxtTitle.setText("Notifications");
 
         mTxtCartCount = findViewById(R.id.txtCartCount);
+
+        mNotificationListContainer = findViewById(R.id.notificationListContainer);
+        mShimmerFrameLayout = findViewById(R.id.notificationsShimmerContainer);
 
         loadNotifications();
     }
@@ -105,27 +116,47 @@ public class NotificationsActivity extends BaseActivity {
     }
 
     private void loadNotifications() {
-        mNotifications.fetch(new RealtimeDataBase.OnFetchCompleted<Notification>() {
+        setShimmer(true);
+        mThreadPoolManager.submitTask(new Runnable() {
             @Override
-            public void onSuccessful(List<Notification> children) {
-                for(Notification n : children){
-                    Log.d(TAG, n.toString());
-                }
-                mNotificationsRecycler = findViewById(R.id.notificationsRecycler);
-                NotificationAdapter notificationAdapter = new NotificationAdapter(NotificationsActivity.this, children, NotificationsActivity.this::onNotificationClick);
-                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(NotificationsActivity.this, LinearLayoutManager.VERTICAL, false);
-                mNotificationsRecycler.setLayoutManager(layoutManager);
-                mNotificationsRecycler.setAdapter(notificationAdapter);
-            }
+            public void run() {
+                mNotifications.fetch();
 
-            @Override
-            public void onFailure(Exception ex) {
+                while(mNotifications.isLoading());
 
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        populateNotificationsRecycler();
+                        setShimmer(false);
+                    }
+                });
             }
         });
     }
 
+    private void populateNotificationsRecycler() {
+        mNotificationsRecycler = findViewById(R.id.notificationsRecycler);
+        NotificationAdapter notificationAdapter = new NotificationAdapter(NotificationsActivity.this, mNotifications.getList(), NotificationsActivity.this::onNotificationClick);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(NotificationsActivity.this, LinearLayoutManager.VERTICAL, false);
+        mNotificationsRecycler.setLayoutManager(layoutManager);
+        mNotificationsRecycler.setAdapter(notificationAdapter);
+    }
+
     private void onNotificationClick(int position) {
 
+    }
+
+    private void setShimmer(boolean state){
+        if(state){
+            mNotificationListContainer.setVisibility(View.GONE);
+            mShimmerFrameLayout.setVisibility(View.VISIBLE);
+            mShimmerFrameLayout.startShimmer();
+
+            return;
+        }
+        mNotificationListContainer.setVisibility(View.VISIBLE);
+        mShimmerFrameLayout.setVisibility(View.GONE);
+        mShimmerFrameLayout.stopShimmer();
     }
 }
