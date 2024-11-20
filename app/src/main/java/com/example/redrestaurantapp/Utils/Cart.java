@@ -15,6 +15,7 @@ public class Cart {
     private static final String TAG = "Cart";
     private static Cart mInstance;
     private static final List<CartRecord> mCartList = new ArrayList<>();
+    private static final List<OnCartCountChange> mCountChangeListeners = new ArrayList<>();
 
     public Cart() {}
 
@@ -29,16 +30,19 @@ public class Cart {
         int id = (int)(Math.random()*10000);
         record.setId(id);
         mCartList.add(record);
+        notifyCountChangeListeners();
     }
 
     public void remove(int id){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mCartList.removeIf((record -> record.getId() == id));
+            notifyCountChangeListeners();
         }
     }
 
     public void remove(CartRecord record){
         mCartList.remove(record);
+        notifyCountChangeListeners();
     }
 
     public int getCartCount() {
@@ -86,5 +90,20 @@ public class Cart {
 
     public void clear() {
         mCartList.clear();
+        notifyCountChangeListeners();
+    }
+
+    public void setOnCountChangeListener(OnCartCountChange listener){
+        mCountChangeListeners.add(listener);
+    }
+
+    public void notifyCountChangeListeners() {
+        for(OnCartCountChange listener : mCountChangeListeners){
+            listener.onChange(getCartCount());
+        }
+    }
+
+    public interface OnCartCountChange {
+        void onChange(int count);
     }
 }

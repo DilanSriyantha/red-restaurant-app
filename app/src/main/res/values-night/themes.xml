@@ -27,4 +27,16 @@
         <!-- Customize your theme here. -->
     </style>
     <style name="Theme.Splash" parent="Theme.AppCompat.DayNight.NoActionBar"/>
+    <style name="FlatButtonStyle" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@color/grey</item>
+        <item name="android:textColor">@color/purple_500</item>
+        <item name="android:padding">8dp</item>
+    </style>
+    <style name="CustomTheme.Dialog" parent="android:Theme.Holo.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+        <item name="buttonBarButtonStyle">@style/FlatButtonStyle</item>
+    </style>
 </resources>

@@ -1,13 +1,11 @@
-package com.example.redrestaurantapp;
+package com.example.redrestaurantapp.Views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
@@ -18,14 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.redrestaurantapp.Adapters.ProductsAdapter;
 import com.example.redrestaurantapp.Controllers.ProductController;
+import com.example.redrestaurantapp.Models.Notification;
+import com.example.redrestaurantapp.R;
 import com.example.redrestaurantapp.Utils.ThreadPoolManager;
-import com.example.redrestaurantapp.Views.CartActivity;
-import com.example.redrestaurantapp.Views.ItemDetailsActivity;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
-import java.io.Serializable;
-
-public class ProductsActivity extends AppCompatActivity {
+public class ProductsActivity extends BaseActivity {
     public enum Mode {
         ALL_PRODUCTS,
         RECENT_PRODUCTS
@@ -36,6 +32,8 @@ public class ProductsActivity extends AppCompatActivity {
     private Mode mMode;
 
     private TextView mTxtTitle;
+    private TextView mTxtNotificationCount;
+    private TextView mTxtCartCount;
 
     private RecyclerView mProductsRecycler;
 
@@ -71,6 +69,8 @@ public class ProductsActivity extends AppCompatActivity {
 
         mTxtTitle = findViewById(R.id.txtAppbarTitle);
         mTxtTitle.setText("All Products");
+        mTxtNotificationCount = findViewById(R.id.txtNotificationCount);
+        mTxtCartCount = findViewById(R.id.txtCartCount);
 
         mProductsRecycler = findViewById(R.id.productsRecycler);
 
@@ -86,6 +86,36 @@ public class ProductsActivity extends AppCompatActivity {
         mBtnNotification.setOnClickListener(this::onNotificationClick);
 
         populateView();
+    }
+
+    @Override
+    protected void updateNotificationsLabel(int count, Notification newNotification) {
+        if(mTxtNotificationCount == null) return;
+
+        if(count == 0){
+            mTxtNotificationCount.setVisibility(View.GONE);
+            return;
+        }
+
+        if(mTxtNotificationCount.getVisibility() == View.GONE)
+            mTxtNotificationCount.setVisibility(View.VISIBLE);
+
+        mTxtNotificationCount.setText(String.valueOf(count));
+    }
+
+    @Override
+    protected void updateCartCountLabel(int count) {
+        if(mTxtCartCount == null) return;
+
+        if(count == 0){
+            mTxtCartCount.setVisibility(View.GONE);
+            return;
+        }
+
+        if(mTxtCartCount.getVisibility() == View.GONE)
+            mTxtCartCount.setVisibility(View.VISIBLE);
+
+        mTxtCartCount.setText(String.valueOf(count));
     }
 
     private void onBackClick(View v){

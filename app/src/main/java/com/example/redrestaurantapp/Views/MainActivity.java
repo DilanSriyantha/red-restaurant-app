@@ -2,50 +2,39 @@ package com.example.redrestaurantapp.Views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.redrestaurantapp.Adapters.CategoriesAdapter;
-import com.example.redrestaurantapp.Controllers.CategoryController;
-import com.example.redrestaurantapp.Interfaces.GetCollectionCallback;
-import com.example.redrestaurantapp.Interfaces.GetDocumentCallback;
-import com.example.redrestaurantapp.Models.Category;
-import com.example.redrestaurantapp.Models.Product;
+import com.example.redrestaurantapp.Models.Notification;
 import com.example.redrestaurantapp.R;
-import com.example.redrestaurantapp.ServiceLayer.FireStore;
-import com.example.redrestaurantapp.Utils.AlertBox;
+import com.example.redrestaurantapp.Services.NotificationManagerService;
 import com.example.redrestaurantapp.Utils.Cart;
+import com.example.redrestaurantapp.Utils.Notifications;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.redrestaurantapp.databinding.ActivityMainBinding;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private final String TAG = "MainActivity";
     private final Cart mCart;
+    private final Notifications mNotification;
 
     private ActivityMainBinding binding;
 
     private ImageButton mBtnCart;
+    private ImageButton mBtnNotifications;
     private TextView mTxtCartCount;
+    private TextView mTxtNotificationCount;
 
     public MainActivity() {
         mCart = Cart.getInstance();
+        mNotification = Notifications.getInstance();
     }
 
     @Override
@@ -67,6 +56,14 @@ public class MainActivity extends AppCompatActivity {
 
         mBtnCart = findViewById(R.id.btnCart);
         mBtnCart.setOnClickListener(this::onCartClick);
+
+        mBtnNotifications = findViewById(R.id.btnNotifications);
+        mBtnNotifications.setOnClickListener(this::onNotificationsClick);
+
+        mTxtNotificationCount = findViewById(R.id.txtNotificationCount);
+
+        Intent serviceIntent = new Intent(this, NotificationManagerService.class);
+        startService(serviceIntent);
     }
 
     @Override
@@ -77,8 +74,45 @@ public class MainActivity extends AppCompatActivity {
         mCart.updateCartLabel(mTxtCartCount);
     }
 
+    @Override
+    protected void updateCartCountLabel(int count) {
+        if(mTxtCartCount == null) return;
+
+        if(count == 0){
+            mTxtCartCount.setVisibility(View.GONE);
+            return;
+        }
+
+        if(mTxtCartCount.getVisibility() == View.GONE)
+            mTxtCartCount.setVisibility(View.VISIBLE);
+
+        mTxtCartCount.setText(String.valueOf(count));
+    }
+
+    @Override
+    protected void updateNotificationsLabel(int count, Notification newNotification) {
+        if(mTxtNotificationCount == null) return;
+
+        if(count == 0){
+            mTxtNotificationCount.setVisibility(View.GONE);
+            return;
+        }
+
+        if(mTxtNotificationCount.getVisibility() == View.GONE)
+            mTxtNotificationCount.setVisibility(View.VISIBLE);
+
+        mTxtNotificationCount.setText(String.valueOf(count));
+    }
+
+
+
     private void onCartClick(View v){
         Intent cartActivity = new Intent(this, CartActivity.class);
         startActivity(cartActivity);
+    }
+
+    private void onNotificationsClick(View v){
+        Intent notificationsActivity = new Intent(this, NotificationsActivity.class);
+        startActivity(notificationsActivity);
     }
 }

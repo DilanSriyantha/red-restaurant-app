@@ -1,4 +1,4 @@
-package com.example.redrestaurantapp;
+package com.example.redrestaurantapp.Views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +9,6 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
@@ -21,17 +20,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.redrestaurantapp.Adapters.CartAdapter;
 import com.example.redrestaurantapp.Controllers.OrderController;
 import com.example.redrestaurantapp.Models.CartRecord;
+import com.example.redrestaurantapp.Models.Notification;
 import com.example.redrestaurantapp.Models.Order;
+import com.example.redrestaurantapp.R;
 import com.example.redrestaurantapp.Utils.AlertBox;
 import com.example.redrestaurantapp.Utils.Cart;
 import com.example.redrestaurantapp.Utils.ThreadPoolManager;
-import com.example.redrestaurantapp.Views.CartActivity;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class ViewOrderActivity extends AppCompatActivity {
+public class ViewOrderActivity extends BaseActivity {
     private final String TAG = "ViewOrderActivity";
 
     private ImageButton mBtnBack;
@@ -44,6 +41,8 @@ public class ViewOrderActivity extends AppCompatActivity {
 
     private TextView mTxtTitle;
     private TextView mTxtSubtotal;
+    private TextView mTxtNotifications;
+    private TextView mTxtCartCount;
 
     private ConstraintLayout mViewOrderContainer;
     private ShimmerFrameLayout mShimmeringLayout;
@@ -93,6 +92,9 @@ public class ViewOrderActivity extends AppCompatActivity {
 
         mTxtSubtotal = findViewById(R.id.txtSubtotal);
 
+        mTxtNotifications = findViewById(R.id.txtNotificationCount);
+        mTxtCartCount = findViewById(R.id.txtCartCount);
+
         mBtnBack.setOnClickListener(this::onBackClick);
         mBtnCart.setOnClickListener(this::onCartClick);
         mBtnNotification.setOnClickListener(this::onNotificationClick);
@@ -107,6 +109,36 @@ public class ViewOrderActivity extends AppCompatActivity {
                 getOrder();
             }
         }, 500);
+    }
+
+    @Override
+    protected void updateNotificationsLabel(int count, Notification newNotification) {
+        if(mTxtNotifications == null) return;
+
+        if(count == 0){
+            mTxtNotifications.setVisibility(View.GONE);
+            return;
+        }
+
+        if(mTxtNotifications.getVisibility() == View.GONE)
+            mTxtNotifications.setVisibility(View.VISIBLE);
+
+        mTxtNotifications.setText(String.valueOf(count));
+    }
+
+    @Override
+    protected void updateCartCountLabel(int count) {
+        if(mTxtCartCount == null) return;
+
+        if(count == 0){
+            mTxtCartCount.setVisibility(View.GONE);
+            return;
+        }
+
+        if(mTxtCartCount.getVisibility() == View.GONE)
+            mTxtCartCount.setVisibility(View.VISIBLE);
+
+        mTxtCartCount.setText(String.valueOf(count));
     }
 
     private void onBackClick(View v){

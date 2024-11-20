@@ -8,24 +8,24 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.redrestaurantapp.Models.CartRecord;
+import com.example.redrestaurantapp.Models.Notification;
 import com.example.redrestaurantapp.Models.Product;
 import com.example.redrestaurantapp.R;
 import com.example.redrestaurantapp.Utils.AlertBox;
 import com.example.redrestaurantapp.Utils.Cart;
 import com.example.redrestaurantapp.Utils.ImageLoader;
 
-public class ItemDetailsActivity extends AppCompatActivity {
+public class ItemDetailsActivity extends BaseActivity {
     private final String TAG = "ItemDetailsActivity";
 
     private TextView mTxtAppBarTitle;
     private TextView mTxtCartCount;
+    private TextView mTxtNotificationCount;
     private TextView mTxtProductName;
     private TextView mTxtProductPrice;
     private TextView mTxtProductDescription;
@@ -51,14 +51,6 @@ public class ItemDetailsActivity extends AppCompatActivity {
     private final ImageLoader mImageLoader = ImageLoader.getInstance(this);
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        if(mTxtCartCount != null)
-            mCart.updateCartLabel(mTxtCartCount);
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        EdgeToEdge.enable(this);
@@ -74,6 +66,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
         mTxtAppBarTitle = findViewById(R.id.txtAppbarTitle);
         mTxtCartCount = findViewById(R.id.txtCartCount);
+        mTxtNotificationCount = findViewById(R.id.txtNotificationCount);
         mTxtProductName = findViewById(R.id.txtProductName);
         mTxtProductPrice = findViewById(R.id.txtProductPrice);
         mTxtProductDescription = findViewById(R.id.txtProductDescription);
@@ -95,14 +88,42 @@ public class ItemDetailsActivity extends AppCompatActivity {
         mBtnRemove.setOnClickListener(this::onRemoveClick);
         mBtnAddToCart.setOnClickListener(this::onAddToCartClick);
 
-        mCart.updateCartLabel(mTxtCartCount);
-
         mQty = 1;
         mTotal = mProduct.getPrice();
 
         mTxtQty.setText(String.valueOf(mQty));
 
         populateScreen();
+    }
+
+    @Override
+    protected void updateNotificationsLabel(int count, Notification newNotification) {
+        if(mTxtNotificationCount == null) return;
+
+        if(count == 0){
+            mTxtNotificationCount.setVisibility(View.GONE);
+            return;
+        }
+
+        if(mTxtNotificationCount.getVisibility() == View.GONE)
+            mTxtNotificationCount.setVisibility(View.VISIBLE);
+
+        mTxtNotificationCount.setText(String.valueOf(count));
+    }
+
+    @Override
+    protected void updateCartCountLabel(int count) {
+        if(mTxtCartCount == null) return;
+
+        if(count == 0){
+            mTxtCartCount.setVisibility(View.GONE);
+            return;
+        }
+
+        if(mTxtCartCount.getVisibility() == View.GONE)
+            mTxtCartCount.setVisibility(View.VISIBLE);
+
+        mTxtCartCount.setText(String.valueOf(count));
     }
 
     private void populateScreen() {

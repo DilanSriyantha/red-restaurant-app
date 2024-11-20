@@ -33,7 +33,7 @@
                     android:drawableEnd="@drawable/baseline_arrow_drop_down_24"
                     android:text="@string/address_button_placeholder"
                     android:textAllCaps="false"
-                    android:textColor="@color/white"
+                    android:textColor="@color/force_white"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 

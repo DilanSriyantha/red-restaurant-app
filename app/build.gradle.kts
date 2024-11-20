@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.com.google.firebase.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.database)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
@@ -61,5 +62,5 @@ dependencies {
     implementation (libs.glide.v4142)
 
     // shimmer
-    implementation("com.facebook.shimmer:shimmer:0.5.0")
+    implementation(libs.shimmer)
 }

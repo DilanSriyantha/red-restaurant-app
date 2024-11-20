@@ -23,6 +23,7 @@ import com.example.redrestaurantapp.Adapters.CartAdapter;
 import com.example.redrestaurantapp.Controllers.OrderController;
 import com.example.redrestaurantapp.Interfaces.OnCompleteListener;
 import com.example.redrestaurantapp.Models.CartRecord;
+import com.example.redrestaurantapp.Models.Notification;
 import com.example.redrestaurantapp.Models.Order;
 import com.example.redrestaurantapp.Models.Product;
 import com.example.redrestaurantapp.R;
@@ -34,7 +35,7 @@ import com.google.firebase.Timestamp;
 
 import java.util.stream.Collectors;
 
-public class CartActivity extends AppCompatActivity {
+public class CartActivity extends BaseActivity {
     private final String TAG = "CartActivity";
 
     private ImageButton mBtnBack;
@@ -50,6 +51,7 @@ public class CartActivity extends AppCompatActivity {
 
     private CheckBox mCheckBoxUtensils;
 
+    private TextView mTxtNotificationCount;
     private TextView mTxtTitle;
     private TextView mTxtSubtotal;
 
@@ -106,6 +108,8 @@ public class CartActivity extends AppCompatActivity {
 
         mTxtTitle.setText(R.string.cart_title);
 
+        mTxtNotificationCount = findViewById(R.id.txtNotificationCount);
+
         if(mCart.getCartCount() == 0)
             setEmptyState(true);
         else
@@ -113,6 +117,26 @@ public class CartActivity extends AppCompatActivity {
 
         populateCart();
         updateSubtotal();
+    }
+
+    @Override
+    protected void updateNotificationsLabel(int count, Notification newNotification) {
+        if(mTxtNotificationCount == null) return;
+
+        if(count == 0){
+            mTxtNotificationCount.setVisibility(View.GONE);
+            return;
+        }
+
+        if(mTxtNotificationCount.getVisibility() == View.GONE)
+            mTxtNotificationCount.setVisibility(View.VISIBLE);
+
+        mTxtNotificationCount.setText(String.valueOf(count));
+    }
+
+    @Override
+    protected void updateCartCountLabel(int count) {
+        // do nothing in here
     }
 
     private void onBackClick(View v){

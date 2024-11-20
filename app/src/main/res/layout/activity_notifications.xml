@@ -5,13 +5,12 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Views.ProductsActivity">
+    tools:context=".Views.NotificationsActivity">
 
     <LinearLayout
-        android:id="@+id/linearLayout11"
+        android:id="@+id/linearLayout12"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -19,42 +18,18 @@
         <include layout="@layout/custom_appbar_2" />
     </LinearLayout>
 
-    <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/productsShimmerLayout"
-        android:visibility="visible"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout11">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <include layout="@layout/product_item_wide_2_shimmer" />
-            <include layout="@layout/product_item_wide_2_shimmer" />
-            <include layout="@layout/product_item_wide_2_shimmer" />
-        </LinearLayout>
-    </com.facebook.shimmer.ShimmerFrameLayout>
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/productsContainer"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout11">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout12">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/productsRecycler"
+            android:id="@+id/notificationsRecycler"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

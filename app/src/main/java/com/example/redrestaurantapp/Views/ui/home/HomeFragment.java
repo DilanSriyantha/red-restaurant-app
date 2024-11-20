@@ -6,8 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,8 +21,8 @@ import com.example.redrestaurantapp.Adapters.CategoriesAdapter;
 import com.example.redrestaurantapp.Adapters.ProductsAdapter;
 import com.example.redrestaurantapp.Controllers.CategoryController;
 import com.example.redrestaurantapp.Controllers.ProductController;
-import com.example.redrestaurantapp.ProductsActivity;
-import com.example.redrestaurantapp.Utils.Cart;
+import com.example.redrestaurantapp.Views.ProductsActivity;
+import com.example.redrestaurantapp.ServiceLayer.RealtimeDataBase;
 import com.example.redrestaurantapp.Utils.ThreadPoolManager;
 import com.example.redrestaurantapp.Views.ItemDetailsActivity;
 import com.example.redrestaurantapp.R;
@@ -54,12 +56,18 @@ public class HomeFragment extends Fragment {
     private ShimmerFrameLayout mOrderAgainShimmerLayout;
     private ShimmerFrameLayout mAllProductsShimmerLayout;
 
+    private ScrollView mParentScrollView;
+
     private TextView mTxtCartCount;
+
+    private RealtimeDataBase rdb;
 
     public HomeFragment() {
         mCategoryController = new CategoryController();
         mProductController = new ProductController();
         mThreadPoolManager = ThreadPoolManager.getInstance();
+
+        rdb = RealtimeDataBase.getInstance("notifications");
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -81,9 +89,13 @@ public class HomeFragment extends Fragment {
         mProgressOrderAgain = root.findViewById(R.id.progressOrderAgain);
         mProgressAllProducts = root.findViewById(R.id.progressAllProducts);
 
+        mParentScrollView = root.findViewById(R.id.parentScrollLayout);
+
         populateCategoryList();
         populateOrderAgainList();
         populateAllProductsList();
+
+        setParentScrollListener();
 
         return root;
     }
@@ -181,6 +193,25 @@ public class HomeFragment extends Fragment {
     private void onAllProductsForwardClick(View v){
         Intent productsActivity = new Intent(requireActivity(), ProductsActivity.class);
         startActivity(productsActivity);
+    }
+
+    private void setParentScrollListener() {
+        mParentScrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                int contentHeight = mParentScrollView.getChildAt(0).getMeasuredHeight();
+                int scrollY = (mParentScrollView.getHeight() + mParentScrollView.getScrollY());
+
+                if(scrollY >= contentHeight){
+                    if(!mAllProductsRecycler.isNestedScrollingEnabled()) {
+                        mAllProductsRecycler.setNestedScrollingEnabled(true);
+                    }
+                }else{
+                    if(mAllProductsRecycler.isNestedScrollingEnabled())
+                        mAllProductsRecycler.setNestedScrollingEnabled(false);
+                }
+            }
+        });
     }
 
     private void setCategoryLoading(boolean state){

@@ -23,6 +23,7 @@ googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.0.0"
 firebaseAnalytics = "22.1.2"
 playServicesAuth = "21.2.0"
+shimmer = "0.5.0"
 
 [libraries]
 com-google-firebase-firebase-auth = { module = "com.google.firebase:firebase-auth" }
@@ -32,6 +33,7 @@ credentials-play-services-auth = { module = "androidx.credentials:credentials-pl
 credentials-v130 = { module = "androidx.credentials:credentials", version.ref = "credentialsVersion" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-database = { module = "com.google.firebase:firebase-database" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-v4142 = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersion" }
@@ -52,6 +54,7 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -45,7 +45,7 @@
                     android:focusableInTouchMode="true"
                     android:marqueeRepeatLimit="marquee_forever"
                     android:text="@string/textview_placeholder"
-                    android:textColor="@color/white"
+                    android:textColor="@color/force_white"
                     android:textSize="@dimen/title_font_size"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"

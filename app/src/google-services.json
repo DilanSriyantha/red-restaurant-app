@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "21443234884",
+    "firebase_url": "https://redrestaurantapp-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "redrestaurantapp",
     "storage_bucket": "redrestaurantapp.appspot.com"
   },
@@ -19,6 +20,14 @@
           "android_info": {
             "package_name": "com.example.redrestaurantapp",
             "certificate_hash": "4dbff1c5927c8f2fa3d3cb1eb67b0f598bdc8e9b"
+          }
+        },
+        {
+          "client_id": "21443234884-tdoge8v5ffto4n715or52v7qaqii1clp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.redrestaurantapp",
+            "certificate_hash": "ec6c51b4599007da6778c5cbded645f5e7ce6bf2"
           }
         },
         {

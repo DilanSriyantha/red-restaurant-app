@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -20,11 +23,22 @@
         android:theme="@style/Theme.RedRestaurantApp"
         tools:targetApi="31">
         <activity
-            android:name=".ProductsActivity"
+            android:name=".Views.NotificationsActivity"
             android:exported="false"
-            android:theme="@style/Theme.RedRestaurantAppCustomAppBar"/>
+            android:theme="@style/Theme.RedRestaurantAppCustomAppBar" />
+
+        <service
+            android:name=".Services.NotificationManagerService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse" />
+
         <activity
-            android:name=".ViewOrderActivity"
+            android:name=".Views.ProductsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.RedRestaurantAppCustomAppBar" />
+        <activity
+            android:name=".Views.ViewOrderActivity"
             android:exported="false"
             android:theme="@style/Theme.RedRestaurantAppCustomAppBar" />
         <activity

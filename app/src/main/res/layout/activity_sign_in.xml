@@ -69,7 +69,7 @@
             android:layout_margin="10dp"
             android:background="@drawable/flat_button"
             android:clickable="true"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/force_white"
             android:elevation="3dp"
             android:focusable="true">
 
@@ -93,7 +93,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/sign_in_with_google"
-                android:textColor="@color/black"
+                android:textColor="@color/force_black"
                 android:textStyle="bold"
                 android:textAlignment="center" />
         </androidx.cardview.widget.CardView>
