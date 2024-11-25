@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.redrestaurantapp.Adapters.CartAdapter;
 import com.example.redrestaurantapp.Controllers.OrderController;
 import com.example.redrestaurantapp.Interfaces.OnCompleteListener;
+import com.example.redrestaurantapp.Models.Address;
 import com.example.redrestaurantapp.Models.CartRecord;
 import com.example.redrestaurantapp.Models.Notification;
 import com.example.redrestaurantapp.Models.Order;
@@ -33,6 +34,7 @@ import com.example.redrestaurantapp.Utils.Cart;
 import com.example.redrestaurantapp.Utils.ThreadPoolManager;
 import com.google.firebase.Timestamp;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class CartActivity extends BaseActivity {
@@ -146,6 +148,19 @@ public class CartActivity extends BaseActivity {
     private void onPlaceOrderClick(View v){
         setLoading(true);
 
+        AtomicReference<Address> orderAddress = new AtomicReference<>();
+        UserManager.getAddress(this, new UserManager.OnAddressReadCompleted() {
+            @Override
+            public void onSuccess(Address address) {
+                orderAddress.set(address);
+            }
+
+            @Override
+            public void onFailed(Exception ex) {
+
+            }
+        });
+
         Order newOrder = new Order(
                 (int)(Math.random()*100000),
                 mUserManager.getCurrentUser().getUid(),
@@ -155,7 +170,8 @@ public class CartActivity extends BaseActivity {
                 mCart.getList(),
                 getSubtotal(),
                 Timestamp.now(),
-                "Pending");
+                "Pending",
+                orderAddress.get());
 
         mOrderController.addOrder(newOrder, new OnCompleteListener<Void>() {
             @Override

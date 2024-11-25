@@ -115,6 +115,10 @@ public class NotificationsActivity extends BaseActivity {
         startActivity(cartActivity);
     }
 
+    private void markAllAsSeen() {
+        mNotifications.markAllAsSeen();
+    }
+
     private void loadNotifications() {
         setShimmer(true);
         mThreadPoolManager.submitTask(new Runnable() {
@@ -129,6 +133,7 @@ public class NotificationsActivity extends BaseActivity {
                     public void run() {
                         populateNotificationsRecycler();
                         setShimmer(false);
+                        markAllAsSeen();
                     }
                 });
             }

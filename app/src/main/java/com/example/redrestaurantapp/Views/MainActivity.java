@@ -2,12 +2,16 @@ package com.example.redrestaurantapp.Views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.redrestaurantapp.Models.Address;
 import com.example.redrestaurantapp.Models.Notification;
 import com.example.redrestaurantapp.R;
+import com.example.redrestaurantapp.ServiceLayer.UserManager;
 import com.example.redrestaurantapp.Services.NotificationManagerService;
 import com.example.redrestaurantapp.Utils.Cart;
 import com.example.redrestaurantapp.Utils.Notifications;
@@ -27,14 +31,19 @@ public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
 
+    private Button mBtnSelectLocation;
+
     private ImageButton mBtnCart;
     private ImageButton mBtnNotifications;
     private TextView mTxtCartCount;
     private TextView mTxtNotificationCount;
 
+    private UserManager mUserManager;
+
     public MainActivity() {
         mCart = Cart.getInstance();
         mNotification = Notifications.getInstance();
+        mUserManager = new UserManager();
     }
 
     @Override
@@ -54,6 +63,9 @@ public class MainActivity extends BaseActivity {
         // NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
+        mBtnSelectLocation = findViewById(R.id.btnSelectLocation);
+        mBtnSelectLocation.setOnClickListener(this::onSelectLocationClick);
+
         mBtnCart = findViewById(R.id.btnCart);
         mBtnCart.setOnClickListener(this::onCartClick);
 
@@ -72,6 +84,7 @@ public class MainActivity extends BaseActivity {
 
         mTxtCartCount = findViewById(R.id.txtCartCount);
         mCart.updateCartLabel(mTxtCartCount);
+        updateAddress();
     }
 
     @Override
@@ -104,7 +117,10 @@ public class MainActivity extends BaseActivity {
         mTxtNotificationCount.setText(String.valueOf(count));
     }
 
-
+    private void onSelectLocationClick(View v){
+        Intent addressDetailsActivity = new Intent(this, AddressDetailsActivity.class);
+        startActivity(addressDetailsActivity);
+    }
 
     private void onCartClick(View v){
         Intent cartActivity = new Intent(this, CartActivity.class);
@@ -114,5 +130,29 @@ public class MainActivity extends BaseActivity {
     private void onNotificationsClick(View v){
         Intent notificationsActivity = new Intent(this, NotificationsActivity.class);
         startActivity(notificationsActivity);
+    }
+
+    private void updateAddress() {
+        UserManager.getAddress(this, new UserManager.OnAddressReadCompleted() {
+            @Override
+            public void onSuccess(Address address) {
+                Log.d(TAG, address.toString());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(!address.getAddressLabel().isEmpty()){
+                            mBtnSelectLocation.setText("Address:\n" + address.getAddressLabel());
+                            return;
+                        }
+                        mBtnSelectLocation.setText("Address:\n" + address.getAddress());
+                    }
+                });
+            }
+
+            @Override
+            public void onFailed(Exception ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 }

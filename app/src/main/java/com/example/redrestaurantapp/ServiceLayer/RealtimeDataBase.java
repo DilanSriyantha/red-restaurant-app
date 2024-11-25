@@ -6,20 +6,26 @@ import android.util.Pair;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class RealtimeDataBase {
     private final String TAG = "RealTimeDataBase";
     private static RealtimeDataBase mInstance;
+    private static FirebaseDatabase mDatabase;
     private static DatabaseReference mDbRef;
 
     public RealtimeDataBase(String databaseReference) {
@@ -34,8 +40,8 @@ public class RealtimeDataBase {
     }
 
     private void init(String databaseReference) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        mDbRef = database.getReference(databaseReference);
+        mDatabase = FirebaseDatabase.getInstance();
+        mDbRef = mDatabase.getReference(databaseReference);
     }
 
     public <T> void fetch(Class<T> model, OnFetchCompleted<T> callback) {
@@ -124,6 +130,19 @@ public class RealtimeDataBase {
         });
     }
 
+    public void updateChildren(Map<String, Object> updates, OnUpdateCompleted callback) {
+        DatabaseReference rootRef = mDatabase.getReference();
+        rootRef.updateChildren(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful())
+                    callback.onCompleted();
+                else
+                    callback.onError(new Exception("Failed to update real-time database: " + task.getException()));
+            }
+        });
+    }
+
     private <T> void handleChildChange(DataSnapshot snapshot, Class<T> model, OnRealTimeDataChangedCallback<T> callback){
         try{
             T modelInstance = model.getDeclaredConstructor().newInstance();
@@ -131,6 +150,10 @@ public class RealtimeDataBase {
 
             for(DataSnapshot snap : snapshot.getChildren()){
                 for(Field field : fields){
+                    if(field.getName().equals("key")){
+                        field.setAccessible(true);
+                        field.set(modelInstance, snapshot.getKey());
+                    }
                     if(field.getName().equals(snap.getKey())){
                         field.setAccessible(true);
                         field.set(modelInstance, snap.getValue());
@@ -151,8 +174,13 @@ public class RealtimeDataBase {
             for(DataSnapshot outerSnap : snapshot.getChildren()){
                 T modelInstance = model.getDeclaredConstructor().newInstance();
                 Field[] fields = model.getDeclaredFields();
+
                 for(DataSnapshot innerSnap : outerSnap.getChildren()){
                     for(Field field : fields){
+                        if(field.getName().equals("key")){
+                            field.setAccessible(true);
+                            field.set(modelInstance, outerSnap.getKey());
+                        }
                         if(field.getName().equals(innerSnap.getKey())){
                             field.setAccessible(true);
                             field.set(modelInstance, innerSnap.getValue());
@@ -176,5 +204,10 @@ public class RealtimeDataBase {
     public interface OnFetchCompleted<T> {
         void onSuccessful(List<T> children);
         void onFailure(Exception ex);
+    }
+
+    public interface OnUpdateCompleted {
+        void onCompleted();
+        void onError(Exception ex);
     }
 }

@@ -5,11 +5,12 @@ import android.media.Image;
 import android.nfc.Tag;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Category {
+public class Category implements Serializable {
     private final String TAG = "Category";
 
     private long id;

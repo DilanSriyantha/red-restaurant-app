@@ -26,12 +26,15 @@
                 android:layout_height="match_parent">
 
                 <Button
-                    android:id="@+id/button"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/btnSelectLocation"
+                    android:layout_width="180dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/flat_button"
                     android:drawableEnd="@drawable/baseline_arrow_drop_down_24"
+                    android:ellipsize="end"
+                    android:maxLines="2"
                     android:text="@string/address_button_placeholder"
+                    android:textAlignment="viewStart"
                     android:textAllCaps="false"
                     android:textColor="@color/force_white"
                     app:layout_constraintStart_toStartOf="parent"

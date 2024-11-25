@@ -65,7 +65,8 @@ public class OrderController {
         FLAG_LOADING = true;
         mFirestore.getCollection(
                 "order",
-                new Pair<String, Object>("userId", mUserManager.getCurrentUser().getUid()),
+                "timestamp",
+                new Pair<>("userId", mUserManager.getCurrentUser().getUid()),
                 Order.class,
                 new GetCollectionCallback<Order>() {
             @Override
@@ -87,9 +88,34 @@ public class OrderController {
 
             @Override
             public void onFailure(Exception ex) {
-                Log.d(TAG, ex.getLocalizedMessage());
+                ex.printStackTrace();
                 FLAG_LOADING = false;
             }
         });
+    }
+
+    public void getOrders(int limitToFirst, OnCompleteOrdersLoading callback){
+        mFirestore.getCollection(
+                "order",
+                limitToFirst,
+                "timestamp",
+                new Pair<>("userId", mUserManager.getCurrentUser().getUid()),
+                Order.class,
+                new GetCollectionCallback<Order>() {
+                    @Override
+                    public void onSuccess(List<Order> resultList) {
+                        callback.onComplete(resultList);
+                    }
+
+                    @Override
+                    public void onFailure(Exception ex) {
+                        callback.onFailure(ex);
+                    }
+        });
+    }
+
+    public interface OnCompleteOrdersLoading {
+        void onComplete(List<Order> orders);
+        void onFailure(Exception ex);
     }
 }

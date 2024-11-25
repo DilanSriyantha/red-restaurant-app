@@ -1,2 +1,5 @@
-package com.example.redrestaurantapp.Interfaces;public interface TaskCallback {
+package com.example.redrestaurantapp.Interfaces;
+
+public interface TaskCallback {
+    void onComplete();
 }

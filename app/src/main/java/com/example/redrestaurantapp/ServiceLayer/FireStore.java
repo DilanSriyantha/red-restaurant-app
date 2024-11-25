@@ -23,6 +23,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -190,6 +191,70 @@ public class FireStore {
                                                     break;
                                                 }
 
+                                                if(!isPrimitive(field) && canCastToHashmap(map.get(key))){
+                                                    Log.d(TAG, field.getName());
+                                                    constructCustomTypedField(modelInstance, field, (HashMap<String, Object>) map.get(key));
+
+                                                    break;
+                                                }
+
+                                                field.setAccessible(true);
+                                                field.set(modelInstance, map.get(key));
+
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    resultList.add(modelInstance);
+                                }
+                                callback.onSuccess(resultList);
+                            }catch (Exception ex){
+                                ex.printStackTrace();
+                                callback.onFailure(ex);
+                            }
+                        }else{
+                            callback.onFailure(new Exception("Get failed with : ", task.getException()));
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public <T> void getCollection(String collection, String orderBy, Pair<String, Object> whereEqualsTo, Class<T> model, GetCollectionCallback<T> callback){
+        Query query = mFirebaseFirestore.collection(collection).whereEqualTo(whereEqualsTo.first, whereEqualsTo.second).orderBy(orderBy);
+
+        mThreadPoolManager.submitTask(new Runnable() {
+            @Override
+            public void run() {
+                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            try{
+                                List<T> resultList = new ArrayList<>();
+                                for(QueryDocumentSnapshot document : task.getResult()){
+                                    T modelInstance = model.getDeclaredConstructor().newInstance();
+                                    Field[] fields = model.getDeclaredFields();
+                                    Map<String, Object> map = document.getData();
+
+                                    for(String key : map.keySet()){
+                                        for(Field field : fields){
+                                            if(field.getName().equals(key)){
+                                                if(field.getGenericType() instanceof ParameterizedType){
+                                                    constructParameterizedFieldValue(modelInstance, field, map.get(key));
+
+                                                    break;
+                                                }
+
+                                                if(!isPrimitive(field) && canCastToHashmap(map.get(key))){
+                                                    Log.d(TAG, field.getName());
+                                                    constructCustomTypedField(modelInstance, field, (HashMap<String, Object>) map.get(key));
+
+                                                    break;
+                                                }
+
                                                 field.setAccessible(true);
                                                 field.set(modelInstance, map.get(key));
 
@@ -237,6 +302,61 @@ public class FireStore {
                                                 field.set(modelInstance, map.get(key));
 
                                                 break;
+                                            }
+                                        }
+                                    }
+
+                                    resultList.add(modelInstance);
+                                }
+
+                                callback.onSuccess(resultList);
+                            }catch (Exception ex){
+                                callback.onFailure(ex);
+                            }
+                        }else{
+                            callback.onFailure(new Exception("Get failed with ", task.getException()));
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public <T> void getCollection(String collection, int limit, String orderBy, Pair<String, Object> whereEqualTo, Class<T> model,  GetCollectionCallback<T> callback) {
+        Query query = mFirebaseFirestore.collection(collection).orderBy(orderBy).whereEqualTo(whereEqualTo.first, whereEqualTo.second).limitToLast(limit);
+
+        mThreadPoolManager.submitTask(new Runnable() {
+            @Override
+            public void run() {
+                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            try {
+                                List<T> resultList = new ArrayList<>();
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    T modelInstance = model.getDeclaredConstructor().newInstance();
+                                    Field[] fields = model.getDeclaredFields();
+                                    Map<String, Object> map = document.getData();
+
+                                    for(String key : map.keySet()){
+                                        for(Field field : fields){
+                                            if(field.getName().equals(key)){
+                                                if(field.getGenericType() instanceof ParameterizedType){
+                                                    constructParameterizedFieldValue(modelInstance, field, map.get(key));
+
+                                                    break;
+                                                }
+
+                                                if(!isPrimitive(field) && canCastToHashmap(map.get(key))){
+                                                    Log.d(TAG, field.getName());
+                                                    constructCustomTypedField(modelInstance, field, (HashMap<String, Object>) map.get(key));
+
+                                                    break;
+                                                }
+
+                                                field.setAccessible(true);
+                                                field.set(modelInstance, map.get(key));
                                             }
                                         }
                                     }
@@ -309,5 +429,26 @@ public class FireStore {
 
         Log.d(TAG, "Product object type -> " + instance.getClass().getTypeName());
         Log.d(TAG, "Product object -> " + instance.toString());
+    }
+
+    private boolean isPrimitive(Field field){
+        return field.getType() == boolean.class ||
+                field.getType() == char.class ||
+                field.getType() == byte.class ||
+                field.getType() == short.class ||
+                field.getType() == int.class ||
+                field.getType() == long.class ||
+                field.getType() == float.class ||
+                field.getType() == double.class ||
+                field.getType() == String.class;
+    }
+    
+    private <T> boolean canCastToHashmap(T object){
+        try{
+            HashMap<String, Object> obj = (HashMap<String, Object>) object;
+            return true;
+        }catch (Exception ex){
+            return false;
+        }
     }
 }

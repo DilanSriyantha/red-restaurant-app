@@ -14,10 +14,11 @@ public class Order {
     private double subtotal;
     private Timestamp timestamp;
     private String status;
+    private Address address;
 
     public Order() {}
 
-    public Order(long id, String userId, String imageUrl, boolean utensilsAllowed, String note, List<CartRecord> cartRecords, double subtotal, Timestamp timestamp, String status) {
+    public Order(long id, String userId, String imageUrl, boolean utensilsAllowed, String note, List<CartRecord> cartRecords, double subtotal, Timestamp timestamp, String status, Address address) {
         this.id = id;
         this.userId = userId;
         this.imageUrl = imageUrl;
@@ -27,6 +28,7 @@ public class Order {
         this.subtotal = subtotal;
         this.timestamp = timestamp;
         this.status = status;
+        this.address = address;
     }
 
     public long getId() {
@@ -101,18 +103,11 @@ public class Order {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", userId='" + userId + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", utensilsAllowed=" + utensilsAllowed +
-                ", note='" + note + '\'' +
-                ", cartRecords=" + cartRecords +
-                ", subtotal=" + subtotal +
-                ", timestamp=" + timestamp +
-                ", status='" + status + '\'' +
-                '}';
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 }

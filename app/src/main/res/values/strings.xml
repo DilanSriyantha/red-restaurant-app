@@ -1,6 +1,6 @@
 <resources>
     <string name="google_oauth_web_client_id">21443234884-qs4798ohnlugn7r6ppibu7kqu5avbekm.apps.googleusercontent.com</string>
-    <string name="app_name">RedRestaurantApp</string>
+    <string name="app_name">Red Restaurant App</string>
     <string name="title_home">Home</string>
     <string name="title_orders">Orders</string>
     <string name="title_account">Account</string>
@@ -36,4 +36,33 @@
     <string name="place_order">Place Order</string>
     <string name="empty_cart">Empty</string>
     <string name="notifications_section_1">Latest</string>
+    <string name="building_type">Building Type</string>
+    <string name="apt_flat_floor">Apt/Flat/Floor</string>
+    <string name="apt_flat_floor_hint">e.g. 1208</string>
+    <string name="building_name">Building Name</string>
+    <string name="building_name_hint">e.g. Central Tower</string>
+    <string name="landmark">Landmark</string>
+    <string name="landmark_hint">e.g.Across the railway station</string>
+    <string name="save_and_continue">Save and continue</string>
+    <string name="drop_off_options">Dropoff Options</string>
+    <string name="instruction_for_delivery">Instructions for delivery person</string>
+    <string name="example_delivery_instructions">Example: Please knock instead of using the doorbell</string>
+    <string name="address_label">Address Label</string>
+    <string name="address_label_hint">Add a label(ex: school)</string>
+    <string name="choose_building_type">Choose Building Type</string>
+    <string name="help_couriers">Help couriers find you</string>
+    <string name="house">House</string>
+    <string name="apartment">Apartment</string>
+    <string name="office">Office</string>
+    <string name="hotel">Hotel</string>
+    <string name="other">Other</string>
+    <string name="edit_pin">Edit pin</string>
+    <string name="edit_pin_2">Edit Pin</string>
+    <string name="edit_pin_3">Move the pin to where the courier will drop off your order.</string>
+    <string name="done">Done</string>
+    <string name="basic_info">Basic Info</string>
+    <string name="name">Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="email">Email</string>
+    <string name="manage_acc_info">*Note: \nUser accounts are managed directly through their Google accounts, therefore users are not permitted to alter their account information within this application.</string>
 </resources>

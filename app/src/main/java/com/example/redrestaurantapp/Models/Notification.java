@@ -1,7 +1,11 @@
 package com.example.redrestaurantapp.Models;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Notification {
-    private int id;
+    private long id;
+    private String key;
     private String title;
     private String to;
     private String from;
@@ -11,8 +15,9 @@ public class Notification {
 
     public Notification() {}
 
-    public Notification(int id, String title, String to, String from, String message, long timestamp, boolean seen) {
+    public Notification(int id, String key, String title, String to, String from, String message, long timestamp, boolean seen) {
         this.id = id;
+        this.key = key;
         this.title = title;
         this.to = to;
         this.from = from;
@@ -21,12 +26,20 @@ public class Notification {
         this.seen = seen;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getTitle() {
@@ -77,10 +90,24 @@ public class Notification {
         this.seen = seen;
     }
 
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("id", id);
+        result.put("title", title);
+        result.put("to", to);
+        result.put("from", from);
+        result.put("message", message);
+        result.put("timestamp", timestamp);
+        result.put("seen", seen);
+
+        return result;
+    }
+
     @Override
     public String toString() {
         return "Notification{" +
                 "id=" + id +
+                ", key='" + key + '\'' +
                 ", title='" + title + '\'' +
                 ", to='" + to + '\'' +
                 ", from='" + from + '\'' +

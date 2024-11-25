@@ -46,17 +46,6 @@ public class NotificationManagerService extends Service {
         startForeground();
 
         new Thread(() -> {
-            while(true){
-                try{
-                    Thread.sleep(1000);
-//                    Log.d(TAG, "service is running");
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
-        }).start();
-
-        new Thread(() -> {
             mNotifications = Notifications.getInstance();
             mNotifications.startListening();
             mNotifications.setOnChangeListener(new Notifications.OnNotificationChange() {
@@ -91,7 +80,10 @@ public class NotificationManagerService extends Service {
 
         try{
             Notification notification =
-                    new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID).build();
+                    new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                            .setContentTitle("Red App Notification Service is Running.")
+                            .setSmallIcon(R.drawable.red_logo_notify)
+                            .build();
 
             int type = 0;
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -105,7 +97,7 @@ public class NotificationManagerService extends Service {
 
     private void postNotification(com.example.redrestaurantapp.Models.Notification notification) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.drawable.red_logo_notify)
                 .setContentTitle(notification.getTitle())
                 .setContentText(notification.getMessage())
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(notification.getMessage()))

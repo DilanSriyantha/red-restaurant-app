@@ -5,6 +5,8 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.example.redrestaurantapp.Interfaces.GetCollectionCallback;
+import com.example.redrestaurantapp.Models.CartRecord;
+import com.example.redrestaurantapp.Models.Order;
 import com.example.redrestaurantapp.Models.Product;
 import com.example.redrestaurantapp.ServiceLayer.FireStore;
 import com.example.redrestaurantapp.Utils.ThreadPoolManager;
@@ -121,5 +123,65 @@ public class ProductController {
                 });
             }
         });
+    }
+
+    public void getAllProducts(OnCompleteProductsLoading callback) {
+        mThreadPoolManager.submitTask(new Runnable() {
+            @Override
+            public void run() {
+                mFirestore.getCollection("product", Product.class, new GetCollectionCallback<Product>() {
+                    @Override
+                    public void onSuccess(List<Product> resultList) {
+                        mProductList = resultList;
+
+                        callback.onComplete(resultList);
+                    }
+
+                    @Override
+                    public void onFailure(Exception ex) {
+                        callback.onFailure(ex);
+                    }
+                });
+            }
+        });
+    }
+
+    public void getRecentProducts(OnCompleteProductsLoading callback){
+        mThreadPoolManager.submitTask(new Runnable() {
+            @Override
+            public void run() {
+                OrderController oc = new OrderController();
+                oc.getOrders(5, new OrderController.OnCompleteOrdersLoading() {
+                    @Override
+                    public void onComplete(List<Order> orders) {
+                        List<Product> recentProducts = new ArrayList<>();
+                        long lastId = -1;
+                        for(Order order : orders){
+                            for(CartRecord record : order.getCartRecords()){
+                                if(lastId == -1){
+                                    lastId = record.getProduct().getId();
+                                    recentProducts.add(record.getProduct());
+                                    continue;
+                                }
+                                if(lastId == record.getProduct().getId()) continue;
+                                lastId = record.getProduct().getId();
+                                recentProducts.add(record.getProduct());
+                            }
+                        }
+                        callback.onComplete(recentProducts);
+                    }
+
+                    @Override
+                    public void onFailure(Exception ex) {
+                        callback.onFailure(ex);
+                    }
+                });
+            }
+        });
+    }
+
+    public interface OnCompleteProductsLoading {
+        void onComplete(List<Product> products);
+        void onFailure(Exception ex);
     }
 }

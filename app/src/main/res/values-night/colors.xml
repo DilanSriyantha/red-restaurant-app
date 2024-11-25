@@ -13,4 +13,5 @@
     <color name="force_black">#000000</color>
     <color name="transparent">#80000000</color>
     <color name="notification_unread">#9C2B2E</color>
+    <color name="default_bg">#303030</color>
 </resources>

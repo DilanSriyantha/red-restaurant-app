@@ -2,6 +2,7 @@ package com.example.redrestaurantapp.Views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.redrestaurantapp.Adapters.ProductsAdapter;
 import com.example.redrestaurantapp.Controllers.ProductController;
+import com.example.redrestaurantapp.Models.Category;
 import com.example.redrestaurantapp.Models.Notification;
 import com.example.redrestaurantapp.R;
 import com.example.redrestaurantapp.Utils.ThreadPoolManager;
@@ -24,7 +26,8 @@ import com.facebook.shimmer.ShimmerFrameLayout;
 public class ProductsActivity extends BaseActivity {
     public enum Mode {
         ALL_PRODUCTS,
-        RECENT_PRODUCTS
+        RECENT_PRODUCTS,
+        CATEGORY
     };
 
     private final String TAG = "ProductActivity";
@@ -39,6 +42,7 @@ public class ProductsActivity extends BaseActivity {
 
     private ConstraintLayout mProductsContainer;
     private ShimmerFrameLayout mProductsShimmerLayout;
+    private ConstraintLayout mEmptyContainer;
 
     private ImageButton mBtnBack;
     private ImageButton mBtnCart;
@@ -47,6 +51,7 @@ public class ProductsActivity extends BaseActivity {
     private final ProductController mProductsController;
     private ProductsAdapter mProductAdapter;
     private final ThreadPoolManager mThreadPoolManager;
+    private Category mCategory;
 
     public ProductsActivity() {
         mProductsController = new ProductController(true);
@@ -67,8 +72,15 @@ public class ProductsActivity extends BaseActivity {
         Intent intent = getIntent();
         mMode = (Mode) intent.getSerializableExtra("mode");
 
+        if(mMode == Mode.CATEGORY)
+            mCategory = (Category) intent.getSerializableExtra("category");
+
         mTxtTitle = findViewById(R.id.txtAppbarTitle);
-        mTxtTitle.setText("All Products");
+        if(mCategory != null)
+            mTxtTitle.setText(mCategory.getName());
+        else
+            mTxtTitle.setText("All Products");
+
         mTxtNotificationCount = findViewById(R.id.txtNotificationCount);
         mTxtCartCount = findViewById(R.id.txtCartCount);
 
@@ -76,6 +88,7 @@ public class ProductsActivity extends BaseActivity {
 
         mProductsContainer = findViewById(R.id.productsContainer);
         mProductsShimmerLayout = findViewById(R.id.productsShimmerLayout);
+        mEmptyContainer = findViewById(R.id.productsEmptyContainer);
 
         mBtnBack = findViewById(R.id.btnBack);
         mBtnCart = findViewById(R.id.btnCart);
@@ -137,7 +150,12 @@ public class ProductsActivity extends BaseActivity {
         mThreadPoolManager.submitTask(new Runnable() {
             @Override
             public void run() {
-                mProductsController.loadData(null);
+                if(mMode == Mode.CATEGORY && mCategory != null)
+                    mProductsController.loadData(new Pair<>("categoryId", mCategory.getId()));
+                else if(mMode == Mode.RECENT_PRODUCTS)
+                    mProductsController.loadData(null);
+                else
+                    mProductsController.loadData(null);
 
                 while(mProductsController.isLoading());
 
@@ -153,6 +171,11 @@ public class ProductsActivity extends BaseActivity {
     }
 
     private void populateProductsRecycler() {
+        if(mProductsController.getProducts().isEmpty()){
+            setEmpty(true);
+            return;
+        }
+        setEmpty(false);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mProductAdapter = new ProductsAdapter(this, mProductsController.getProducts(), ProductsAdapter.LayoutType.LARGE, this::onItemClick);
         mProductsRecycler.setLayoutManager(layoutManager);
@@ -165,12 +188,23 @@ public class ProductsActivity extends BaseActivity {
         startActivity(itemDetailsActivity);
     }
 
+    private void setEmpty(boolean state){
+        if(state){
+            if(mEmptyContainer.getVisibility() == View.VISIBLE) return;
+            mProductsContainer.setVisibility(View.GONE);
+            mEmptyContainer.setVisibility(View.VISIBLE);
+            return;
+        }
+        if(mEmptyContainer.getVisibility() == View.GONE) return;
+        mProductsContainer.setVisibility(View.VISIBLE);
+        mEmptyContainer.setVisibility(View.GONE);
+    }
+
     private void setShimmer(boolean state){
         if(state){
             mProductsContainer.setVisibility(View.GONE);
             mProductsShimmerLayout.setVisibility(View.VISIBLE);
             mProductsShimmerLayout.startShimmer();
-
             return;
         }
         mProductsContainer.setVisibility(View.VISIBLE);

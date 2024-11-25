@@ -2,12 +2,14 @@ package com.example.redrestaurantapp.Views.ui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ import com.example.redrestaurantapp.Adapters.CategoriesAdapter;
 import com.example.redrestaurantapp.Adapters.ProductsAdapter;
 import com.example.redrestaurantapp.Controllers.CategoryController;
 import com.example.redrestaurantapp.Controllers.ProductController;
+import com.example.redrestaurantapp.Models.Product;
 import com.example.redrestaurantapp.Views.ProductsActivity;
 import com.example.redrestaurantapp.ServiceLayer.RealtimeDataBase;
 import com.example.redrestaurantapp.Utils.ThreadPoolManager;
@@ -28,6 +31,8 @@ import com.example.redrestaurantapp.Views.ItemDetailsActivity;
 import com.example.redrestaurantapp.R;
 import com.example.redrestaurantapp.databinding.FragmentHomeBinding;
 import com.facebook.shimmer.ShimmerFrameLayout;
+
+import java.util.List;
 
 public class HomeFragment extends Fragment {
     private final String TAG = "HomeFragment";
@@ -56,6 +61,8 @@ public class HomeFragment extends Fragment {
     private ShimmerFrameLayout mOrderAgainShimmerLayout;
     private ShimmerFrameLayout mAllProductsShimmerLayout;
 
+    private LinearLayout mOrderAgainContainer;
+
     private ScrollView mParentScrollView;
 
     private TextView mTxtCartCount;
@@ -64,7 +71,7 @@ public class HomeFragment extends Fragment {
 
     public HomeFragment() {
         mCategoryController = new CategoryController();
-        mProductController = new ProductController();
+        mProductController = new ProductController(true);
         mThreadPoolManager = ThreadPoolManager.getInstance();
 
         rdb = RealtimeDataBase.getInstance("notifications");
@@ -88,6 +95,8 @@ public class HomeFragment extends Fragment {
         mProgressCategory = root.findViewById(R.id.progressCategory);
         mProgressOrderAgain = root.findViewById(R.id.progressOrderAgain);
         mProgressAllProducts = root.findViewById(R.id.progressAllProducts);
+
+        mOrderAgainContainer = root.findViewById(R.id.orderAgainContainer);
 
         mParentScrollView = root.findViewById(R.id.parentScrollLayout);
 
@@ -128,18 +137,34 @@ public class HomeFragment extends Fragment {
         mThreadPoolManager.submitTask(new Runnable() {
             @Override
             public void run() {
-                while(mProductController.isLoading());
-                Log.d(TAG, "finished loading products");
-
-                requireActivity().runOnUiThread(new Runnable() {
+                mProductController.getRecentProducts(new ProductController.OnCompleteProductsLoading() {
                     @Override
-                    public void run() {
-                        mOrderAgainProductsAdapter = new ProductsAdapter(getActivity(), mProductController.getProducts(), ProductsAdapter.LayoutType.NARROW, HomeFragment.this::onOrderAgainItemClick);
-                        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-                        mProductRecycler.setLayoutManager(layoutManager);
-                        mProductRecycler.setAdapter(mOrderAgainProductsAdapter);
+                    public void onComplete(List<Product> products) {
+                        requireActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(products.isEmpty() || products.size() < 5){
+                                    mOrderAgainContainer.setVisibility(View.GONE);
+                                    return;
+                                }
+                                mOrderAgainProductsAdapter = new ProductsAdapter(getActivity(), products, ProductsAdapter.LayoutType.NARROW, HomeFragment.this::onOrderAgainItemClick);
+                                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+                                mProductRecycler.setLayoutManager(layoutManager);
 
-                        setOrderAgainLoading(false);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        setOrderAgainLoading(false);
+                                        mProductRecycler.setAdapter(mOrderAgainProductsAdapter);
+                                    }
+                                }, 2000);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception ex) {
+                        ex.printStackTrace();
                     }
                 });
             }
@@ -151,19 +176,31 @@ public class HomeFragment extends Fragment {
         mThreadPoolManager.submitTask(new Runnable() {
             @Override
             public void run() {
-                while (mProductController.isLoading());
-                Log.d(TAG, "finished loading all products");
-
-                requireActivity().runOnUiThread(new Runnable() {
+                mProductController.getAllProducts(new ProductController.OnCompleteProductsLoading() {
                     @Override
-                    public void run() {
-                        mAllProductsAdapter = new ProductsAdapter(getActivity(), mProductController.getProducts(), ProductsAdapter.LayoutType.WIDE,
-                                HomeFragment.this::onAllProductItemClick);
-                        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-                        mAllProductsRecycler.setLayoutManager(layoutManager);
-                        mAllProductsRecycler.setAdapter(mAllProductsAdapter);
+                    public void onComplete(List<Product> products) {
+                        requireActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAllProductsAdapter = new ProductsAdapter(getActivity(), products, ProductsAdapter.LayoutType.WIDE,
+                                        HomeFragment.this::onAllProductItemClick);
+                                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+                                mAllProductsRecycler.setLayoutManager(layoutManager);
 
-                        setAllProductsLoading(false);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        setAllProductsLoading(false);
+                                        mAllProductsRecycler.setAdapter(mAllProductsAdapter);
+                                    }
+                                }, 2500);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception ex) {
+                        ex.printStackTrace();
                     }
                 });
             }
@@ -171,18 +208,21 @@ public class HomeFragment extends Fragment {
     }
 
     private void onCategoryClick(int position){
-        Log.d(TAG, "" + position);
+        Intent productsActivity = new Intent(getActivity(), ProductsActivity.class);
+        productsActivity.putExtra("mode", ProductsActivity.Mode.CATEGORY);
+        productsActivity.putExtra("category", mCategoryController.getCategory(position));
+        startActivity(productsActivity);
     }
 
     private void onOrderAgainItemClick(int position){
         Intent productDetailsActivity = new Intent(getActivity(), ItemDetailsActivity.class);
-        productDetailsActivity.putExtra("product", mProductController.getProduct(position));
+        productDetailsActivity.putExtra("product", mOrderAgainProductsAdapter.getProduct(position));
         startActivity(productDetailsActivity);
     }
 
     private void onAllProductItemClick(int position){
         Intent productDetailsActivity = new Intent(getActivity(), ItemDetailsActivity.class);
-        productDetailsActivity.putExtra("product", mProductController.getProduct(position));
+        productDetailsActivity.putExtra("product", mAllProductsAdapter.getProduct(position));
         startActivity(productDetailsActivity);
     }
 

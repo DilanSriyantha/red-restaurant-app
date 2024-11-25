@@ -1,6 +1,7 @@
 package com.example.redrestaurantapp.Views.ui.account;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import com.example.redrestaurantapp.R;
 import com.example.redrestaurantapp.Utils.ImageLoader;
 import com.example.redrestaurantapp.ServiceLayer.UserManager;
+import com.example.redrestaurantapp.Views.ManageAccountActivity;
 import com.example.redrestaurantapp.Views.SignInActivity;
 import com.example.redrestaurantapp.databinding.FragmentAccountBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,45 +64,16 @@ public class AccountFragment extends Fragment {
         mProgressOverlay = root.findViewById(R.id.progressOverlay);
 
         mBtnManageAccount = root.findViewById(R.id.btnManageAccount);
-        mBtnManageAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "manage account", Toast.LENGTH_SHORT).show();
-            }
-        });
+        mBtnManageAccount.setOnClickListener(this::onManageAccountClick);
 
         mBtnPrivacy = root.findViewById(R.id.btnPrivacy);
-        mBtnPrivacy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+        mBtnPrivacy.setOnClickListener(this::onPrivacyClick);
 
         mBtnAbout = root.findViewById(R.id.btnAbout);
-        mBtnAbout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+        mBtnAbout.setOnClickListener(this::onAboutClick);
 
         mBtnLogout = root.findViewById(R.id.btnLogout);
-        mBtnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setProgressing(true);
-
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        FirebaseAuth.getInstance().signOut();
-                        navigateToSignIn();
-                    }
-                }, 1000);
-            }
-        });
+        mBtnLogout.setOnClickListener(this::onLogoutClick);
 
         mTxtUserName = root.findViewById(R.id.txtUserName);
         mTxtUserName.setText(mUser.getCurrentUser().getDisplayName());
@@ -126,6 +99,36 @@ public class AccountFragment extends Fragment {
             mProgressOverlay.setVisibility(View.VISIBLE);
         else
             mProgressOverlay.setVisibility(View.GONE);
+    }
+
+    private void onManageAccountClick(View v){
+        Intent manageAccountActivity = new Intent(getActivity(), ManageAccountActivity.class);
+        startActivity(manageAccountActivity);
+    }
+
+    private void onLogoutClick(View v){
+        setProgressing(true);
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                FirebaseAuth.getInstance().signOut();
+                navigateToSignIn();
+            }
+        }, 1000);
+    }
+
+    private void onAboutClick(View v){
+        Uri link = Uri.parse("https://pastebin.com/raw/VtUiVxrN");
+        Intent viewLink = new Intent(Intent.ACTION_VIEW, link);
+        startActivity(viewLink);
+    }
+
+    private void onPrivacyClick(View v){
+        Uri link = Uri.parse("https://pastebin.com/raw/r83qPZRK");
+        Intent viewLink = new Intent(Intent.ACTION_VIEW, link);
+        startActivity(viewLink);
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.TextView;
 
@@ -13,7 +14,9 @@ import com.example.redrestaurantapp.ServiceLayer.RealtimeDataBase;
 import com.example.redrestaurantapp.ServiceLayer.UserManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Notifications {
     private static final String TAG = "Notifications";
@@ -40,14 +43,10 @@ public class Notifications {
         mRdb.startListeningToChildEvents("to", mUserManager.getCurrentUser().getUid(), Notification.class, new RealtimeDataBase.OnRealTimeDataChangedCallback<Notification>() {
             @Override
             public void onChange(Notification newNotification) {
-                Log.d(TAG,"Notifications updated!");
-                mInstance.add(newNotification);
+                if(newNotification.isSeen()) return;
 
-                for (Notification n : mNotificationList){
-                    Log.d(TAG, n.toString());
-                }
-                Log.d(TAG, "" + mNotificationList.size());
-
+                mNotificationList.add(newNotification);
+                printNotifications();
                 notifyListeners(newNotification);
             }
 
@@ -69,6 +68,7 @@ public class Notifications {
             public void onSuccessful(List<Notification> children) {
                 mNotificationList.clear();
                 mNotificationList.addAll(children);
+                printNotifications();
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -87,6 +87,38 @@ public class Notifications {
                         isLoading = false;
                     }
                 }, 1000);
+            }
+        });
+    }
+
+    public void markAllAsSeen() {
+        ThreadPoolManager.getInstance().submitTask(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, Object> updates = new HashMap<>();
+                for(Notification notification : mNotificationList){
+                    if(notification.isSeen()) continue;
+
+                    updates.put("notifications/"+notification.getKey()+"/seen", true);
+                }
+                if(updates.isEmpty()) {
+                    Log.d(TAG, "no updates to notifications");
+                    return;
+                }
+                mRdb.updateChildren(updates, new RealtimeDataBase.OnUpdateCompleted() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d(TAG, "notifications are marked as seen successfully.");
+                        for(Notification notification : mNotificationList){
+                            notification.setSeen(true);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
             }
         });
     }
@@ -112,7 +144,13 @@ public class Notifications {
     }
 
     public int getCount() {
-        return mNotificationList.size();
+        int count = 0;
+        for(Notification notification : mNotificationList){
+            if(notification.isSeen()) continue;
+            count++;
+        }
+
+        return count;
     }
 
     public List<Notification> getList() {
@@ -149,6 +187,12 @@ public class Notifications {
 
     public void clear() {
         mNotificationList.clear();
+    }
+
+    private void printNotifications() {
+        for(Notification notification : mNotificationList){
+            Log.d(TAG, notification.toString());
+        }
     }
 
     private void notifyListeners(Notification newNotification) {
