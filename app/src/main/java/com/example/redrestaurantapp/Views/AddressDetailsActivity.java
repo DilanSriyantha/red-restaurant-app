@@ -337,22 +337,22 @@ public class AddressDetailsActivity extends AppCompatActivity implements OnMapRe
 
         Log.d(TAG + "[updateFields]:", address.toString());
 
-        if(!address.getBuildingType().isEmpty())
+        if(address.getBuildingType() != null && !address.getBuildingType().isEmpty())
             txtBuildingType.setText(address.getBuildingType());
 
-        if(!address.getAptFlatFloor().isEmpty())
+        if(address.getBuildingType() != null && !address.getAptFlatFloor().isEmpty())
             txtAptFlatFloor.setText(address.getAptFlatFloor());
 
-        if(!address.getBuildingName().isEmpty())
+        if(address.getBuildingType() != null && !address.getBuildingName().isEmpty())
             txtBuildingName.setText(address.getBuildingName());
 
-        if(!address.getLandmark().isEmpty())
+        if(address.getBuildingType() != null && !address.getLandmark().isEmpty())
             txtLandmark.setText(address.getLandmark());
 
-        if(!address.getDeliveryInstructions().isEmpty())
+        if(address.getBuildingType() != null && !address.getDeliveryInstructions().isEmpty())
             txtDeliveryInstructions.setText(address.getDeliveryInstructions());
 
-        if(!address.getAddressLabel().isEmpty())
+        if(address.getBuildingType() != null && !address.getAddressLabel().isEmpty())
             txtAddressLabel.setText(address.getAddressLabel());
     }
 

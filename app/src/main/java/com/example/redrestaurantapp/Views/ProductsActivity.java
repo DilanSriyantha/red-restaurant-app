@@ -2,10 +2,12 @@ package com.example.redrestaurantapp.Views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -19,15 +21,19 @@ import com.example.redrestaurantapp.Adapters.ProductsAdapter;
 import com.example.redrestaurantapp.Controllers.ProductController;
 import com.example.redrestaurantapp.Models.Category;
 import com.example.redrestaurantapp.Models.Notification;
+import com.example.redrestaurantapp.Models.Product;
 import com.example.redrestaurantapp.R;
 import com.example.redrestaurantapp.Utils.ThreadPoolManager;
 import com.facebook.shimmer.ShimmerFrameLayout;
+
+import java.util.List;
 
 public class ProductsActivity extends BaseActivity {
     public enum Mode {
         ALL_PRODUCTS,
         RECENT_PRODUCTS,
-        CATEGORY
+        CATEGORY,
+        SEARCH
     };
 
     private final String TAG = "ProductActivity";
@@ -52,6 +58,7 @@ public class ProductsActivity extends BaseActivity {
     private ProductsAdapter mProductAdapter;
     private final ThreadPoolManager mThreadPoolManager;
     private Category mCategory;
+    private String searchText;
 
     public ProductsActivity() {
         mProductsController = new ProductController(true);
@@ -75,9 +82,14 @@ public class ProductsActivity extends BaseActivity {
         if(mMode == Mode.CATEGORY)
             mCategory = (Category) intent.getSerializableExtra("category");
 
+        if(mMode == Mode.SEARCH)
+            searchText = intent.getStringExtra("searchText");
+
         mTxtTitle = findViewById(R.id.txtAppbarTitle);
-        if(mCategory != null)
+        if(mMode == Mode.CATEGORY)
             mTxtTitle.setText(mCategory.getName());
+        else if(mMode == Mode.SEARCH)
+            mTxtTitle.setText("Results");
         else
             mTxtTitle.setText("All Products");
 
@@ -145,41 +157,159 @@ public class ProductsActivity extends BaseActivity {
     }
 
     private void populateView() {
+        if(mMode == Mode.CATEGORY && mCategory != null)
+            loadCategory();
+        else if(mMode == Mode.RECENT_PRODUCTS)
+            loadRecentProducts();
+        else if(mMode == Mode.ALL_PRODUCTS)
+            loadAllProducts();
+        else if(mMode == Mode.SEARCH)
+            loadSearchResults();
+        else
+            setEmpty(true);
+    }
+
+    private void loadCategory() {
         setShimmer(true);
+        mProductsController.getSpecificProducts(
+                new Pair<>("categoryId", mCategory.getId()),
+                new ProductController.OnCompleteProductsLoading() {
+                    @Override
+                    public void onComplete(List<Product> products) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(products == null || products.isEmpty()){
+                                    setEmpty(true);
+                                    setShimmer(false);
+                                    return;
+                                }
+                                populateProductsRecycler(products);
+                            }
+                        });
+                    }
 
-        mThreadPoolManager.submitTask(new Runnable() {
+                    @Override
+                    public void onFailure(Exception ex) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ex.printStackTrace();
+                                setShimmer(false);
+                                Toast.makeText(ProductsActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+        );
+    }
+
+    private void loadRecentProducts() {
+        setShimmer(true);
+        mProductsController.getRecentProducts(new ProductController.OnCompleteProductsLoading() {
             @Override
-            public void run() {
-                if(mMode == Mode.CATEGORY && mCategory != null)
-                    mProductsController.loadData(new Pair<>("categoryId", mCategory.getId()));
-                else if(mMode == Mode.RECENT_PRODUCTS)
-                    mProductsController.loadData(null);
-                else
-                    mProductsController.loadData(null);
-
-                while(mProductsController.isLoading());
-
+            public void onComplete(List<Product> products) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        populateProductsRecycler();
+                        if(products == null || products.isEmpty()){
+                            setShimmer(false);
+                            setEmpty(true);
+                            return;
+                        }
+                        populateProductsRecycler(products);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception ex) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ex.printStackTrace();
                         setShimmer(false);
+                        Toast.makeText(ProductsActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
     }
 
-    private void populateProductsRecycler() {
-        if(mProductsController.getProducts().isEmpty()){
-            setEmpty(true);
-            return;
-        }
-        setEmpty(false);
+    private void loadAllProducts() {
+        setShimmer(true);
+        mProductsController.getAllProducts(new ProductController.OnCompleteProductsLoading() {
+            @Override
+            public void onComplete(List<Product> products) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(products == null || products.isEmpty()){
+                            setShimmer(false);
+                            setEmpty(true);
+                            return;
+                        }
+                        populateProductsRecycler(products);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception ex) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ex.printStackTrace();
+                        setShimmer(false);
+                        Toast.makeText(ProductsActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+
+    private void loadSearchResults() {
+        setShimmer(true);
+        mProductsController.getSearchResults(
+                new Pair<>("name", searchText),
+                new ProductController.OnCompleteProductsLoading() {
+                    @Override
+                    public void onComplete(List<Product> products) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(products == null || products.isEmpty()){
+                                    setShimmer(false);
+                                    setEmpty(true);
+                                    return;
+                                }
+                                populateProductsRecycler(products);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception ex) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ex.printStackTrace();
+                                setShimmer(false);
+                                Toast.makeText(ProductsActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+        );
+    }
+
+    private void populateProductsRecycler(List<Product> products) {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mProductAdapter = new ProductsAdapter(this, mProductsController.getProducts(), ProductsAdapter.LayoutType.LARGE, this::onItemClick);
+        mProductAdapter = new ProductsAdapter(this, products, ProductsAdapter.LayoutType.LARGE, this::onItemClick);
         mProductsRecycler.setLayoutManager(layoutManager);
         mProductsRecycler.setAdapter(mProductAdapter);
+        if(mProductsShimmerLayout.isShimmerVisible())
+            setShimmer(false);
     }
 
     private void onItemClick(int pos){

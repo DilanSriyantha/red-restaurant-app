@@ -180,6 +180,55 @@ public class ProductController {
         });
     }
 
+    public void getSpecificProducts(Pair<String, Object> whereEqualTo, OnCompleteProductsLoading callback){
+        mThreadPoolManager.submitTask(new Runnable() {
+            @Override
+            public void run() {
+                mFirestore.getCollection(
+                        "product",
+                        whereEqualTo,
+                        Product.class,
+                        new GetCollectionCallback<Product>() {
+                            @Override
+                            public void onSuccess(List<Product> resultList) {
+                                callback.onComplete(resultList);
+                            }
+
+                            @Override
+                            public void onFailure(Exception ex) {
+                                callback.onFailure(ex);
+                            }
+                        }
+                );
+            }
+        });
+    }
+
+    public void getSearchResults(Pair<String, Object> whereLikeOrEqualTo, OnCompleteProductsLoading callback){
+        mThreadPoolManager.submitTask(new Runnable() {
+            @Override
+            public void run() {
+                mFirestore.getSearchResults(
+                        "product",
+                        whereLikeOrEqualTo,
+                        Product.class,
+                        new GetCollectionCallback<Product>() {
+                            @Override
+                            public void onSuccess(List<Product> resultList) {
+                                callback.onComplete(resultList);
+                            }
+
+                            @Override
+                            public void onFailure(Exception ex) {
+                                callback.onFailure(ex);
+                            }
+                        }
+
+                );
+            }
+        });
+    }
+
     public interface OnCompleteProductsLoading {
         void onComplete(List<Product> products);
         void onFailure(Exception ex);

@@ -6,8 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +29,8 @@ public class OrdersFragment extends Fragment {
 
     private ShimmerFrameLayout mShimmeringOverlay;
 
+    private LinearLayout mEmptyContainer;
+
     private final OrderController mOrderController;
     private final ThreadPoolManager mThreadPoolManager;
     private RecyclerView mOrderRecycler;
@@ -41,6 +45,8 @@ public class OrdersFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentOrdersBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        mEmptyContainer = root.findViewById(R.id.emptyListIndicator);
 
         mShimmeringOverlay = root.findViewById(R.id.ordersShimmeringLayout);
 
@@ -63,6 +69,12 @@ public class OrdersFragment extends Fragment {
                 requireActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if(mOrderController.getOrders().isEmpty()){
+                            mEmptyContainer.setVisibility(View.VISIBLE);
+                            mOrderRecycler.setVisibility(View.GONE);
+                            setShimmering(false);
+                            return;
+                        }
                         mOrderAdapter = new OrdersAdapter(getActivity(), mOrderController.getOrders(), OrdersFragment.this::onItemClick);
                         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
                         mOrderRecycler.setLayoutManager(layoutManager);

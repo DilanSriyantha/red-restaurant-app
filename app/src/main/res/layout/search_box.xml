@@ -20,12 +20,14 @@
             android:layout_marginStart="5dp"
             android:src="@drawable/baseline_search_24" />
         <EditText
+            android:id="@+id/txtSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/search_hint"
             android:textCursorDrawable="@drawable/cursor"
             android:layout_marginStart="10dp"
             android:inputType="text"
+            android:imeOptions="actionSearch"
             android:paddingVertical="10dp"
             android:background="@drawable/search_text_background"/>
     </LinearLayout>

@@ -12,6 +12,8 @@ import com.example.redrestaurantapp.Utils.ThreadPoolManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -87,7 +89,8 @@ public class UserManager {
                 File file = new File(cacheDir, "AddressInfo");
 
                 if(!file.exists()){
-                    callback.onFailed(new Exception("AddressInfo file does not exist"));
+                    mAddress = new Address();
+                    callback.onSuccess(mAddress);
                     return;
                 }
 

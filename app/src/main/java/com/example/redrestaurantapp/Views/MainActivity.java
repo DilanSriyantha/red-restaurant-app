@@ -140,11 +140,13 @@ public class MainActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(!address.getAddressLabel().isEmpty()){
+                        if(address.getAddressLabel() != null && !address.getAddressLabel().isEmpty()){
                             mBtnSelectLocation.setText("Address:\n" + address.getAddressLabel());
                             return;
                         }
-                        mBtnSelectLocation.setText("Address:\n" + address.getAddress());
+
+                        if(address.getAddress() != null && !address.getAddress().isEmpty())
+                            mBtnSelectLocation.setText("Address:\n" + address.getAddress());
                     }
                 });
             }

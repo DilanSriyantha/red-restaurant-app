@@ -377,6 +377,61 @@ public class FireStore {
         });
     }
 
+    public <T> void getSearchResults(String collection, Pair<String, Object> whereLikeOrEqualTo, Class<T> model,  GetCollectionCallback<T> callback) {
+        Query query = mFirebaseFirestore.collection(collection).whereGreaterThanOrEqualTo(whereLikeOrEqualTo.first, whereLikeOrEqualTo.second).whereLessThan(whereLikeOrEqualTo.first, whereLikeOrEqualTo.second+"\uF8FF");
+
+        mThreadPoolManager.submitTask(new Runnable() {
+            @Override
+            public void run() {
+                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            try {
+                                List<T> resultList = new ArrayList<>();
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    T modelInstance = model.getDeclaredConstructor().newInstance();
+                                    Field[] fields = model.getDeclaredFields();
+                                    Map<String, Object> map = document.getData();
+
+                                    for(String key : map.keySet()){
+                                        for(Field field : fields){
+                                            if(field.getName().equals(key)){
+                                                if(field.getGenericType() instanceof ParameterizedType){
+                                                    constructParameterizedFieldValue(modelInstance, field, map.get(key));
+
+                                                    break;
+                                                }
+
+                                                if(!isPrimitive(field) && canCastToHashmap(map.get(key))){
+                                                    Log.d(TAG, field.getName());
+                                                    constructCustomTypedField(modelInstance, field, (HashMap<String, Object>) map.get(key));
+
+                                                    break;
+                                                }
+
+                                                field.setAccessible(true);
+                                                field.set(modelInstance, map.get(key));
+                                            }
+                                        }
+                                    }
+
+                                    resultList.add(modelInstance);
+                                }
+
+                                callback.onSuccess(resultList);
+                            }catch (Exception ex){
+                                callback.onFailure(ex);
+                            }
+                        }else{
+                            callback.onFailure(new Exception("Get failed with ", task.getException()));
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     private <T> void constructParameterizedFieldValue(T parentObject, Field field, Object value) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
         Type[] actualTypeArgs = parameterizedType.getActualTypeArguments();

@@ -1,18 +1,26 @@
 package com.example.redrestaurantapp.Views.ui.home;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -33,6 +41,7 @@ import com.example.redrestaurantapp.databinding.FragmentHomeBinding;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class HomeFragment extends Fragment {
     private final String TAG = "HomeFragment";
@@ -56,6 +65,8 @@ public class HomeFragment extends Fragment {
     private ProgressBar mProgressCategory;
     private ProgressBar mProgressOrderAgain;
     private ProgressBar mProgressAllProducts;
+
+    private EditText mTxtSearch;
 
     private ShimmerFrameLayout mCategoryShimmerLayout;
     private ShimmerFrameLayout mOrderAgainShimmerLayout;
@@ -99,6 +110,9 @@ public class HomeFragment extends Fragment {
         mOrderAgainContainer = root.findViewById(R.id.orderAgainContainer);
 
         mParentScrollView = root.findViewById(R.id.parentScrollLayout);
+
+        mTxtSearch = root.findViewById(R.id.txtSearch);
+        mTxtSearch.setOnEditorActionListener(this::onSearchInitiated);
 
         populateCategoryList();
         populateOrderAgainList();
@@ -232,10 +246,27 @@ public class HomeFragment extends Fragment {
 
     private void onAllProductsForwardClick(View v){
         Intent productsActivity = new Intent(requireActivity(), ProductsActivity.class);
+        productsActivity.putExtra("mode", ProductsActivity.Mode.ALL_PRODUCTS);
         startActivity(productsActivity);
     }
 
-    private void setParentScrollListener() {
+    private boolean onSearchInitiated(TextView v, int actionId, KeyEvent event) {
+        if(actionId != EditorInfo.IME_ACTION_SEARCH) return false;
+
+        if(v.getText().toString().isEmpty()) return false;
+
+        char[] chars = v.getText().toString().toCharArray();
+        chars[0] = Character.toUpperCase(chars[0]);
+        String searchText = new String(chars);
+
+        Intent productsActivity = new Intent(getActivity(), ProductsActivity.class);
+        productsActivity.putExtra("searchText", searchText);
+        productsActivity.putExtra("mode", ProductsActivity.Mode.SEARCH);
+        startActivity(productsActivity);
+        return true;
+    }
+
+    private void setParentScrollListener(){
         mParentScrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
@@ -247,11 +278,25 @@ public class HomeFragment extends Fragment {
                         mAllProductsRecycler.setNestedScrollingEnabled(true);
                     }
                 }else{
-                    if(mAllProductsRecycler.isNestedScrollingEnabled())
+                    if(mAllProductsRecycler.isNestedScrollingEnabled()) {
                         mAllProductsRecycler.setNestedScrollingEnabled(false);
+                    }
                 }
+
+                Log.d(TAG, "" + mAllProductsRecycler.isNestedScrollingEnabled() + "\nScrollY: " + scrollY + "\ncontentHeight: " + contentHeight);
             }
         });
+    }
+
+    private void onParentScrollChange() {
+        int contentHeight = mParentScrollView.getChildAt(0).getMeasuredHeight();
+        int scrollY = mParentScrollView.getScrollY();
+        int parentHeight = mParentScrollView.getHeight();
+
+        if(scrollY + parentHeight >= contentHeight)
+            mAllProductsRecycler.setNestedScrollingEnabled(true);
+        else
+            mAllProductsRecycler.setNestedScrollingEnabled(false);
     }
 
     private void setCategoryLoading(boolean state){
