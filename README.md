@@ -66,37 +66,28 @@ Once the project is loaded, sync the project with the Gradle files to ensure all
 - Click on **Run** button (the green play button) in Android Studio to install and run the app on your device.    
 ## Screenshots
 
-![Sign In - Light](https://i.ibb.co/4WKH4Lc/Screenshot-2024-11-27-12-22-42-32-e33103b46cd9e081972a488dd1ee15bd.jpg)
+<div>
+  <img src="https://i.ibb.co/4WKH4Lc/Screenshot-2024-11-27-12-22-42-32-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/pyZBTGg/Screenshot-2024-11-27-12-22-26-59-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/j3qkxWZ/Screenshot-2024-11-27-12-23-02-35-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/WtvKG2Z/Screenshot-2024-11-27-12-20-15-56-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/mN6dwPf/Screenshot-2024-11-27-12-24-01-27-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/Tk2qtHH/Screenshot-2024-11-27-12-20-28-15-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/mS6Z0CC/Screenshot-2024-11-27-12-24-11-73-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/kc1Y6Fz/Screenshot-2024-11-27-12-20-40-79-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/YRnKPw5/Screenshot-2024-11-27-12-23-53-49-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/Y8VqtS0/Screenshot-2024-11-27-12-21-33-75-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/4NzFWFT/Screenshot-2024-11-27-12-23-45-22-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/HTYFssW/Screenshot-2024-11-27-12-22-06-00-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/c6CVyHq/Screenshot-2024-11-27-12-23-30-03-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/PjMYqCq/Screenshot-2024-11-27-12-21-43-07-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/x5SyrHb/Screenshot-2024-11-27-12-21-11-25-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+  <img src="https://i.ibb.co/xfCwqQF/Screenshot-2024-11-27-12-23-23-08-e33103b46cd9e081972a488dd1ee15bd.jpg" width="240">
+</div>
 
-![Sign In - Dark](https://i.ibb.co/pyZBTGg/Screenshot-2024-11-27-12-22-26-59-e33103b46cd9e081972a488dd1ee15bd.jpg)
 
-![Home - Light](https://i.ibb.co/j3qkxWZ/Screenshot-2024-11-27-12-23-02-35-e33103b46cd9e081972a488dd1ee15bd.jpg)
 
-![Home - Dark](https://i.ibb.co/WtvKG2Z/Screenshot-2024-11-27-12-20-15-56-e33103b46cd9e081972a488dd1ee15bd.jpg)
 
-![Address Details - Light](https://i.ibb.co/mN6dwPf/Screenshot-2024-11-27-12-24-01-27-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Address Details - Dark](https://i.ibb.co/Tk2qtHH/Screenshot-2024-11-27-12-20-28-15-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Edit Pin - Light](https://i.ibb.co/mS6Z0CC/Screenshot-2024-11-27-12-24-11-73-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Edit Pin - Dark](https://i.ibb.co/kc1Y6Fz/Screenshot-2024-11-27-12-20-40-79-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Cart - Light](https://i.ibb.co/YRnKPw5/Screenshot-2024-11-27-12-23-53-49-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Cart - Dark](https://i.ibb.co/Y8VqtS0/Screenshot-2024-11-27-12-21-33-75-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Account - Light](https://i.ibb.co/4NzFWFT/Screenshot-2024-11-27-12-23-45-22-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Account - Dark](https://i.ibb.co/HTYFssW/Screenshot-2024-11-27-12-22-06-00-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Orders - Light](https://i.ibb.co/c6CVyHq/Screenshot-2024-11-27-12-23-30-03-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Orders - Dark](https://i.ibb.co/PjMYqCq/Screenshot-2024-11-27-12-21-43-07-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Item Details - Dark](https://i.ibb.co/x5SyrHb/Screenshot-2024-11-27-12-21-11-25-e33103b46cd9e081972a488dd1ee15bd.jpg)
-
-![Menu - Light](https://i.ibb.co/xfCwqQF/Screenshot-2024-11-27-12-23-23-08-e33103b46cd9e081972a488dd1ee15bd.jpg)
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/DilanSriyantha/red-restaurant-app?tab=MIT-1-ov-file) file for details.
