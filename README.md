@@ -5,9 +5,6 @@ The **Red Restaurant App** is a sophisticated Android-based food delivery applic
 
 This app is developed using **Android Studio** with **Java** as the programming language.
 
-This app is developed using **Android Studio** with **Java** as the programming language.
-
-
 ## Features
 
 - **Browse Menu**: View the full menu with descriptions, images, and pricing for each item.
